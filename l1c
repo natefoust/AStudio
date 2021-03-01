@@ -1,0 +1,130 @@
+    package com.example.myapplication
+
+import android.graphics.Color
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+
+    class MainActivity : AppCompatActivity() {
+
+        private var currentScore=0;
+        private val buttons= arrayOfNulls<Button>(9)
+        private var currentColor=0
+        private val colors= arrayOf(Color.YELLOW, Color.GREEN, Color.RED, Color.BLUE)
+        private var tableOfColors=Array(3){  Array(3){0} }
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_main)
+            onGameStart()
+        }
+        public fun onGameStart()
+        {
+            getButtons()
+            reset()
+            randomizeColor()
+        }
+
+        public fun reset() {
+            for (i in buttons) {
+                i?.setBackgroundColor(Color.BLACK)
+            }
+            for (i in 0..2)
+                for (j in 0..2) {
+                    tableOfColors[i][j] = 0
+                }
+        }
+        public fun getButtons()
+        {
+            buttons[0]=findViewById(R.id.button)
+            buttons[1]=findViewById(R.id.button2)
+            buttons[2]=findViewById(R.id.button3)
+            buttons[3]=findViewById(R.id.button4)
+            buttons[4]=findViewById(R.id.button5)
+            buttons[5]=findViewById(R.id.button6)
+            buttons[6]=findViewById(R.id.button7)
+            buttons[7]=findViewById(R.id.button8)
+            buttons[8]=findViewById(R.id.button9)
+            for(i in 0..8)
+            {
+                buttons[i]?.setOnClickListener{ buttons[i]?.let { it1 -> onColorButtonClick(it1,i) } }
+            }
+
+        }
+        public fun onColorButtonClick(view:View, numberOfButton:Int) {
+            for(i in 0..2)
+            {
+                for(j in 0..2)
+                {
+                    if(i*3+j==numberOfButton)
+                    {
+                        if(tableOfColors[i][j]==0) {
+                            tableOfColors[i][j] = currentColor
+                            buttons[i * 3 + j]?.setBackgroundColor(currentColor)
+                            check()
+                            randomizeColor()
+                            resetTableIfNoWays()
+                            return
+                        }
+                    }
+                }
+            }
+        }
+        public fun changeScore(newScore: Int) {
+            currentScore=newScore
+            findViewById<TextView>(R.id.score).text = "Score:$currentScore"
+        }
+        public fun randomizeColor()
+        {
+            var temp=(0..3).random()
+            currentColor=colors[temp]
+            findViewById<Button>(R.id.button10).setBackgroundColor(colors[temp])
+        }
+        public fun check() {
+            var f = arrayOf(0, 0, 0)
+            for (i in 0..2) {
+                for (j in 0..2) {
+                    f[j] = tableOfColors[i][j]
+                }
+                if ((f[0] == f[1]) && (f[0] == f[2]) && (f[0] != 0)) {
+                    for (j in 0..2) {
+                        buttons[3 * i + j]?.setBackgroundColor(Color.BLACK)
+                        tableOfColors[i][j]=0
+                    }
+                    changeScore(++currentScore)
+                    return
+                }
+                f = arrayOf(0, 0, 0)
+            }
+            for (i in 0..2) {
+                for (j in 0..2) {
+                    f[j] = tableOfColors[j][i]
+                }
+                if ((f[0] == f[1]) && (f[0] == f[2]) && (f[0] != 0)) {
+                    for (j in 0..2) {
+                        buttons[3 * j + i]?.setBackgroundColor(Color.BLACK)
+                        tableOfColors[j][i]=0
+                    }
+                    changeScore(++currentScore)
+                    return
+                }
+                f = arrayOf(0, 0, 0)
+            }
+        }
+        public fun resetTableIfNoWays()
+        {
+            for(i in 0..2){
+                for(j in 0..2)
+                {
+                    if(tableOfColors[i][j]==0)
+                        return
+                }
+            }
+            reset()
+            changeScore(0)
+        }
+
+
+
+    }
